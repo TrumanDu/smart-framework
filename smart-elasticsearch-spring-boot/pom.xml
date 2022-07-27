@@ -5,7 +5,7 @@
     <parent>
         <artifactId>smart-framework</artifactId>
         <groupId>top.trumandu</groupId>
-        <version>0.0.1-SNAPSHOT:2.7.2</version>
+        <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 

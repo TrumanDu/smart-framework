@@ -19,7 +19,7 @@ import java.util.Map;
 
 /**
  * @author Truman.P.Du
- * @date 2019/12/28
+ * @date 2022/07/26
  * @description
  */
 
@@ -40,11 +40,11 @@ public class KafkaProducerTemplate<K, V> {
     private KafkaTemplate<K, V> kafkaTemplate(Map<String, Object> producerProperties) {
         return new KafkaTemplate<>(producerFactory(producerProperties));
     }
-
+    @SuppressWarnings("unused")
     public Map<String, Object> getProperties() {
         return properties;
     }
-
+    @SuppressWarnings("unused")
     public KafkaTemplate<K, V> getKafkaTemplate() {
         return kafkaTemplate;
     }
@@ -56,22 +56,22 @@ public class KafkaProducerTemplate<K, V> {
         }
         kafkaTemplate = kafkaTemplate(properties);
     }
-
+    @SuppressWarnings("unused")
     public ListenableFuture<SendResult<K, V>> send(String topic, V data) {
         return kafkaTemplate.send(topic, data);
     }
 
-
+    @SuppressWarnings("unused")
     public ListenableFuture<SendResult<K, V>> send(String topic, K key, V data) {
         return kafkaTemplate.send(topic, key, data);
     }
 
-
+    @SuppressWarnings("unused")
     public ListenableFuture<SendResult<K, V>> send(String topic, Integer partition, K key, V data) {
         return kafkaTemplate.send(topic, partition, key, data);
     }
 
-
+    @SuppressWarnings("unused")
     public ListenableFuture<SendResult<K, V>> send(String topic, Integer partition, Long timestamp, K key, V data) {
         return kafkaTemplate.send(topic, partition, timestamp, key, data);
     }
@@ -81,21 +81,21 @@ public class KafkaProducerTemplate<K, V> {
         return kafkaTemplate.send(record);
     }
 
-
+    @SuppressWarnings({"unused","rawtypes","unchecked"})
     public void send(ProducerRecord<K, V> record, ListenableFutureCallback callback) {
         ListenableFuture<SendResult<K, V>> future = kafkaTemplate.send(record);
         future.addCallback(callback);
     }
-
+    @SuppressWarnings("unused")
     public List<PartitionInfo> partitionsFor(String topic) {
         return kafkaTemplate.partitionsFor(topic);
     }
-
+    @SuppressWarnings("unused")
     public ListenableFuture<SendResult<K, V>> send(Message<?> message) {
         return kafkaTemplate.send(message);
     }
 
-
+    @SuppressWarnings("unused")
     public boolean sendSync(ProducerRecord<K, V> record) {
         ListenableFuture<SendResult<K, V>> future = send(record);
         try {
@@ -106,7 +106,7 @@ public class KafkaProducerTemplate<K, V> {
             return false;
         }
     }
-
+    @SuppressWarnings("unused")
     public boolean sendSync(List<ProducerRecord<K, V>> records) {
         List<ListenableFuture<SendResult<K, V>>> futures = new ArrayList<>();
         records.forEach(record -> futures.add(kafkaTemplate.send(record)));
@@ -120,7 +120,7 @@ public class KafkaProducerTemplate<K, V> {
         }
         return true;
     }
-
+    @SuppressWarnings("unused")
     public List<Boolean> sendSyncBatch(List<ProducerRecord<K, V>> records) {
         List<ListenableFuture<SendResult<K, V>>> futures = new ArrayList<>();
         records.forEach(record -> futures.add(kafkaTemplate.send(record)));
@@ -136,7 +136,7 @@ public class KafkaProducerTemplate<K, V> {
         }
         return results;
     }
-
+    @SuppressWarnings("unused")
     public void flush() {
         kafkaTemplate.flush();
     }

@@ -1,35 +1,68 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>top.trumandu</groupId>
-  <artifactId>smart-framework</artifactId>
-  <packaging>pom</packaging>
-  <version>${revision}</version>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.7.2</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
 
-  <name>smart-framework</name>
-  <description>A simple smart-framework.</description>
+    <groupId>top.trumandu</groupId>
+    <artifactId>smart-framework</artifactId>
+    <packaging>pom</packaging>
+    <version>${revision}</version>
+    <name>smart-framework</name>
+    <description>A simple smart-framework.</description>
 
+    <properties>
+        <java.version>1.8</java.version>
+        <revision>0.0.1-SNAPSHOT(2.7.2)</revision>
+    </properties>
 
-  <parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.7.2</version>
-    <relativePath/> <!-- lookup parent from repository -->
-  </parent>
+    <modules>
+        <module>smart-common</module>
+        <module>smart-spring-boot-common</module>
+        <module>smart-redis-spring-boot</module>
+        <module>smart-elasticsearch-spring-boot</module>
+        <module>smart-hbase-spring-boot</module>
+        <module>smart-config-spring-boot</module>
+        <module>smart-kafka-spring-boot-starter</module>
+    </modules>
 
-  <properties>
-    <java.version>1.8</java.version>
-    <revision>0.0.1-SNAPSHOT:2.7.2</revision>
-  </properties>
-
-  <modules>
-    <module>smart-common</module>
-    <module>smart-spring-boot-common</module>
-    <module>smart-redis-spring-boot</module>
-    <module>smart-elasticsearch-spring-boot</module>
-    <module>smart-hbase-spring-boot</module>
-    <module>smart-config-spring-boot</module>
-    <module>smart-kafka-spring-boot-starter</module>
-  </modules>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>1.2.7</version>
+                <!--<configuration>
+                    <updatePomFile>true</updatePomFile>
+                    <flattenMode>oss</flattenMode>
+                    <pomElements>
+                        <parent>expand</parent>
+                        <distributionManagement>remove</distributionManagement>
+                        <repositories>remove</repositories>
+                    </pomElements>
+                </configuration>-->
+                <executions>
+                    <execution>
+                        <id>flatten</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>flatten.clean</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

@@ -1,20 +1,19 @@
 package top.trumandu.kafka;
 
 
+import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
-import org.springframework.kafka.listener.BatchMessageListener;
-import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
-import org.springframework.kafka.listener.ContainerProperties;
-import org.springframework.kafka.listener.MessageListener;
+import org.springframework.kafka.listener.*;
 import top.trumandu.kafka.constant.Constants;
 import top.trumandu.kafka.utils.KafkaPropertiesHelper;
 
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Truman.P.Du
- * @date 2020/01/07
+ * @date 2022/07/26
  */
 public class KafkaConsumerTemplate<K, V> {
     private Map<String, Object> properties;
@@ -32,19 +31,21 @@ public class KafkaConsumerTemplate<K, V> {
         this.containerProperties = containerProperties;
     }
 
+    @SuppressWarnings("unused")
     public Map<String, Object> getProperties() {
         return properties;
     }
 
-    private Map<String, Object> consumerConfigs() {
+    protected Map<String, Object> consumerConfigs() {
         return KafkaPropertiesHelper.convertToConsumerProperties(properties);
     }
 
-    private ContainerProperties buildDefaultContainerProperties() {
+    protected ContainerProperties buildDefaultContainerProperties() {
         Object handler = properties.get(Constants.Consumer.HANDLER);
         if (handler == null) {
             throw new IllegalArgumentException("consumer config handle must not  null.");
         }
+        @SuppressWarnings("unchecked")
         Map<String, Object> handlerMap = (Map<String, Object>) handler;
         if (!handlerMap.containsKey(Constants.Consumer.TOPIC_LIST)) {
             throw new IllegalArgumentException("consumer config topicList must not  null.");
@@ -70,11 +71,11 @@ public class KafkaConsumerTemplate<K, V> {
     }
 
 
-    private ConsumerFactory<K, V> buildDefaultConsumerFactory(Map<String, Object> consumerConfigs) {
+    protected ConsumerFactory<K, V> buildDefaultConsumerFactory(Map<String, Object> consumerConfigs) {
         return new DefaultKafkaConsumerFactory<>(consumerConfigs);
     }
 
-    private ConcurrentMessageListenerContainer<K, V> createConcurrentContainer(ContainerProperties containerProps, ConsumerFactory<K, V> consumerFactory) {
+    protected ConcurrentMessageListenerContainer<K, V> createConcurrentContainer(ContainerProperties containerProps, ConsumerFactory<K, V> consumerFactory) {
         ConcurrentMessageListenerContainer<K, V> kvConcurrentMessageListenerContainer = new ConcurrentMessageListenerContainer<>(consumerFactory, containerProps);
         kvConcurrentMessageListenerContainer.setConcurrency(getConcurrency());
         return kvConcurrentMessageListenerContainer;
@@ -85,6 +86,7 @@ public class KafkaConsumerTemplate<K, V> {
         if (!properties.containsKey(Constants.Consumer.HANDLER)) {
             concurrency = 1;
         } else {
+            @SuppressWarnings("unchecked")
             Map<String, Object> handlerMap = (Map<String, Object>) properties.get(Constants.Consumer.HANDLER);
             concurrency = (int) handlerMap.getOrDefault(Constants.Consumer.CONCURRENCY, 1);
         }
@@ -97,8 +99,9 @@ public class KafkaConsumerTemplate<K, V> {
         }
     }
 
-    private void startContainer(Object listener, ConsumerFactory<K, V> consumerFactory) {
+    private void startContainer(Object listener, CommonErrorHandler commonErrorHandler, ConsumerRebalanceListener consumerRebalanceListener) {
         synchronized (this) {
+            ConsumerFactory<K, V> consumerFactory = buildDefaultConsumerFactory(consumerConfigs());
             if (listener == null || containerProperties == null) {
                 throw new IllegalArgumentException("consumer messageListener/containerProperties must not  null.");
             }
@@ -106,16 +109,23 @@ public class KafkaConsumerTemplate<K, V> {
             if (concurrentMessageListenerContainer != null && concurrentMessageListenerContainer.isRunning()) {
                 throw new RuntimeException("concurrentMessageListenerContainer is running.");
             }
+
+            if (Objects.nonNull(consumerRebalanceListener)) {
+                containerProperties.setConsumerRebalanceListener(consumerRebalanceListener);
+            }
             containerProperties.setMessageListener(listener);
             if (concurrentMessageListenerContainer == null) {
                 this.consumerFactory = consumerFactory;
                 concurrentMessageListenerContainer = createConcurrentContainer(containerProperties, consumerFactory);
             }
+            if (Objects.nonNull(commonErrorHandler)) {
+                concurrentMessageListenerContainer.setCommonErrorHandler(commonErrorHandler);
+            }
             concurrentMessageListenerContainer.start();
         }
     }
 
-
+    @SuppressWarnings("unused")
     public void start() {
         checkNullPoint(concurrentMessageListenerContainer);
         if (concurrentMessageListenerContainer.isRunning()) {
@@ -124,12 +134,14 @@ public class KafkaConsumerTemplate<K, V> {
         concurrentMessageListenerContainer.start();
     }
 
+    @SuppressWarnings("unused")
     public synchronized void restart() {
         checkNullPoint(concurrentMessageListenerContainer);
         concurrentMessageListenerContainer.stop();
         concurrentMessageListenerContainer.start();
     }
 
+    @SuppressWarnings("unused")
     public synchronized void stop() {
         checkNullPoint(concurrentMessageListenerContainer);
         if (!concurrentMessageListenerContainer.isRunning()) {
@@ -138,6 +150,7 @@ public class KafkaConsumerTemplate<K, V> {
         concurrentMessageListenerContainer.stop();
     }
 
+    @SuppressWarnings("unused")
     public synchronized void stop(Runnable callback) {
         checkNullPoint(concurrentMessageListenerContainer);
         if (!concurrentMessageListenerContainer.isRunning()) {
@@ -146,6 +159,7 @@ public class KafkaConsumerTemplate<K, V> {
         concurrentMessageListenerContainer.stop(callback);
     }
 
+    @SuppressWarnings("unused")
     public synchronized void pause() {
         checkNullPoint(concurrentMessageListenerContainer);
         if (concurrentMessageListenerContainer.isContainerPaused()) {
@@ -154,6 +168,7 @@ public class KafkaConsumerTemplate<K, V> {
         concurrentMessageListenerContainer.pause();
     }
 
+    @SuppressWarnings("unused")
     public synchronized void resume() {
         checkNullPoint(concurrentMessageListenerContainer);
         if (!concurrentMessageListenerContainer.isContainerPaused()) {
@@ -162,6 +177,7 @@ public class KafkaConsumerTemplate<K, V> {
         concurrentMessageListenerContainer.resume();
     }
 
+    @SuppressWarnings("unused")
     public synchronized void reload(Map<String, Object> properties) {
         checkNullPoint(concurrentMessageListenerContainer);
         concurrentMessageListenerContainer.stop(() -> {
@@ -181,13 +197,25 @@ public class KafkaConsumerTemplate<K, V> {
      *
      * @param messageListener 事件处理监听器
      */
+    @SuppressWarnings("unused")
     public void run(MessageListener<K, V> messageListener) {
-        run(messageListener, buildDefaultConsumerFactory(consumerConfigs()));
+        run(messageListener, null, null);
     }
 
-    public void run(MessageListener<K, V> messageListener, ConsumerFactory<K, V> consumerFactory) {
-        startContainer(messageListener, consumerFactory);
+    @SuppressWarnings("unused")
+    public void run(MessageListener<K, V> messageListener, CommonErrorHandler commonErrorHandler) {
+        run(messageListener, commonErrorHandler, null);
     }
+
+    @SuppressWarnings("unused")
+    public void run(MessageListener<K, V> messageListener, ConsumerRebalanceListener consumerRebalanceListener) {
+        run(messageListener, null, consumerRebalanceListener);
+    }
+
+    public void run(MessageListener<K, V> messageListener, CommonErrorHandler commonErrorHandler, ConsumerRebalanceListener consumerRebalanceListener) {
+        startContainer(messageListener, commonErrorHandler, consumerRebalanceListener);
+    }
+
 
     /**
      * 启动消费服务，支持批量处理消息，支持多线程
@@ -196,17 +224,22 @@ public class KafkaConsumerTemplate<K, V> {
      *
      * @param batchMessageListener 事件处理监听器
      */
+    @SuppressWarnings("unused")
     public void run(BatchMessageListener<K, V> batchMessageListener) {
-        run(batchMessageListener, buildDefaultConsumerFactory(consumerConfigs()));
+        run(batchMessageListener, null, null);
     }
 
-    /**
-     * 启动消费服务，支持批量处理消息，支持多线程
-     *
-     * @param batchMessageListener 事件处理监听器
-     * @param consumerFactory      自定义consumerFactory
-     */
-    public void run(BatchMessageListener<K, V> batchMessageListener, ConsumerFactory<K, V> consumerFactory) {
-        startContainer(batchMessageListener, consumerFactory);
+    @SuppressWarnings("unused")
+    public void run(BatchMessageListener<K, V> batchMessageListener, CommonErrorHandler commonErrorHandler) {
+        run(batchMessageListener, commonErrorHandler, null);
+    }
+
+    @SuppressWarnings("unused")
+    public void run(BatchMessageListener<K, V> batchMessageListener, ConsumerRebalanceListener consumerRebalanceListener) {
+        run(batchMessageListener, null, consumerRebalanceListener);
+    }
+
+    public void run(BatchMessageListener<K, V> batchMessageListener, CommonErrorHandler commonErrorHandler, ConsumerRebalanceListener consumerRebalanceListener) {
+        startContainer(batchMessageListener, commonErrorHandler, consumerRebalanceListener);
     }
 }

@@ -45,9 +45,7 @@ public class KafkaSourceFieldCallback implements ReflectionUtils.FieldCallback {
         final Class<?> generic = field.getType();
         String fieldClassName = generic.getName();
         Object beanInstance = getBeanInstance(annotationName, fieldClassName, generic);
-        if (beanInstance != null) {
-            field.set(bean, beanInstance);
-        }
+        field.set(bean, beanInstance);
     }
 
 
@@ -59,7 +57,7 @@ public class KafkaSourceFieldCallback implements ReflectionUtils.FieldCallback {
         return kafkaConfigProperties.getConsumers();
     }
 
-
+    @SuppressWarnings("all")
     public final Object getBeanInstance(final String annotationName, final String fieldClassName, Class generic) {
         Object objInstance = null;
         String beanName = annotationName + Constants.BEAN_NAME_SPLIT + fieldClassName;

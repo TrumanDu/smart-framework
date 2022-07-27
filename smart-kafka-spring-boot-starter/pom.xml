@@ -3,13 +3,18 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>smart-spring-boot-common</artifactId>
         <groupId>top.trumandu</groupId>
+        <artifactId>smart-spring-boot-common</artifactId>
         <version>${revision}</version>
         <relativePath>../smart-spring-boot-common</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
+    <groupId>top.trumandu</groupId>
     <artifactId>smart-kafka-spring-boot-starter</artifactId>
+
+    <properties>
+        <spring-kafka.version>2.9.0</spring-kafka.version>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -17,5 +22,4 @@
             <artifactId>spring-kafka</artifactId>
         </dependency>
     </dependencies>
-
 </project>

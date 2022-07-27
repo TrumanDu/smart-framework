@@ -9,7 +9,7 @@
  <dependency>
     <groupId>top.trumandu</groupId>
 	<artifactId>smart-kafka-spring-boot-starter</artifactId>
-    <version>0.1.12-SNAPSHOT</version>
+    <version>0.0.1-SNAPSHOT(2.7.2)</version>
 </dependency>
 ```
 # 3. How To Use
@@ -82,13 +82,13 @@ kafkaConsumerTemplate.run(new MessageListener<String, String>() {
 ```
 @KafkaSource(name = "e4")
 KafkaConsumerTemplate<String, String> kafkaConsumerTemplate;
-kafkaConsumerTemplate.run(new ConsumerAwareMessageListener<String, String>() {
+kafkaConsumerTemplate.run(new AcknowledgingMessageListener<String, String>() {
             @Override
-            public void onMessage(ConsumerRecord<String, String> data, Consumer<?, ?> consumer) {
-                System.out.println(data.toString());
-               consumer.commitSync();
+            public void onMessage(ConsumerRecord<String, String> consumerRecord, Acknowledgment acknowledgment) {
+                System.out.println(consumerRecord.toString());
+                acknowledgment.acknowledge();
             }
-});
+        });
 ```
 
 更多MessageListener接口详见：

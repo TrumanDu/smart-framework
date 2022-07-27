@@ -6,7 +6,7 @@
         <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
+    <groupId>top.trumandu</groupId>
     <artifactId>smart-spring-boot-common</artifactId>
     <packaging>pom</packaging>
     <name>smart-spring-boot-common</name>
@@ -29,6 +29,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-
 </project>

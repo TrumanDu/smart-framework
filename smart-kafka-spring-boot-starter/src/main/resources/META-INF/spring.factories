@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-top.trumandu.kafka.KafkaAnnotationConfiguration
+top.trumandu.kafka.KafkaAnnotationAutoConfiguration

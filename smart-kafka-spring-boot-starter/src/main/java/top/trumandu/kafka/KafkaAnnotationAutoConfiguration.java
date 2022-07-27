@@ -14,5 +14,5 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties(KafkaConfigProperties.class)
 @ComponentScan("top.trumandu.kafka.annotation")
 @ConditionalOnProperty(prefix = "smart.framework.kafka",value = "enabled")
-public class KafkaAnnotationConfiguration {
+public class KafkaAnnotationAutoConfiguration {
 }
